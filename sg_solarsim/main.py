@@ -2,7 +2,7 @@
     Launches ss_gui
     closes when ss_gui is closed
 """
-from ss_gui import SSTopGui
+from sg_solarsim.ss_gui import SSTopGui
 
 sstop = SSTopGui()
 sstop.start_gui()

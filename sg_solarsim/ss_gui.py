@@ -17,7 +17,7 @@ import pandas as pd
 from pkg_resources import resource_stream, resource_filename
 
 # local modules and classes
-from tmy_clock import tmy_clock
+from sg_solarsim.tmy_clock import tmy_clock
 
 class SSTopGui:
     """ Top level GUI for the Solar Array Simulator Python code"""

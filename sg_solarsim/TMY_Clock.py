@@ -11,7 +11,7 @@ except:
 import math	# Required For Coordinates Calculation
 from datetime import datetime, timedelta
 from pytz import utc, timezone
-from timezones import timezones
+from sg_solarsim.timezones import timezones
 
 from pvlib import iotools
 

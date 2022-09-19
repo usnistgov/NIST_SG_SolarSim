@@ -1,7 +1,6 @@
-/.idea
 /.venv
 /sg_solarsim.egg-info
 /sg_solarsim/__pycache__
-/sg_solarsim/resources/__pycache__/*.pyc
-/sg_solarsim/resources/data/__pycache__/*.pyc
 *.pyc
+.idea
+build

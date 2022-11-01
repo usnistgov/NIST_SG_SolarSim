@@ -1,7 +1,6 @@
 """ss_gui module:  Graphical User Interface for the NIST Solar Array Simulator python code"""
 
 # standard library imports
-import math
 
 # third party imports
 # pvlib-python
@@ -19,6 +18,7 @@ from pkg_resources import resource_stream, resource_filename
 # local modules and classes
 from sg_solarsim.tmy_clock import tmy_clock
 
+
 class SSTopGui:
     """ Top level GUI for the Solar Array Simulator Python code"""
 
@@ -34,13 +34,13 @@ class SSTopGui:
         self.modules = pvsys.retrieve_sam(modlistname)
         module_names = self.modules.columns.values.tolist()
         combo_modules = sg.DD(module_names,
-                              default_value='SunPower_SPR_220_BLK_U_Module___2008_',
+                              default_value=module_names[0],
                               key='-MODULES-',
                               enable_events=True)    # Modules drop down
         self.theme = sg.theme(theme)
-        tbar = sg.Titlebar(title='PV IV Curve',
-                           icon=resource_filename('sg_solarsim.resources.images','GS-PV-array-icon.png'),
-                           )
+#        tbar = sg.Titlebar(title='PV IV Curve',
+#                           icon=resource_filename('sg_solarsim.resources.images','GS-PV-array-icon.png'),
+#                           )
         self.window = []    # placeholder for the gui window object
         self.clk = []       # placeholder for the TMY_Clock object
         self.state = "OPEN"
@@ -51,11 +51,12 @@ class SSTopGui:
         today = datetime.today().strftime('%B %d')
         tomorrow = (datetime.today()+timedelta(1)).strftime('%B %d')
 
-        button_images = [resource_filename('sg_solarsim.resources.images','play.png'),resource_filename('sg_solarsim.resources.images','pause.png'),resource_filename('sg_solarsim.resources.images','stop.png')]
+        button_images = [resource_filename('sg_solarsim.resources.images', 'play.png'), resource_filename('sg_solarsim.resources.images','pause.png'),resource_filename('sg_solarsim.resources.images','stop.png')]
 
         self.layout = [
             #[tbar],
-            [sg.Text('Solar Module')],
+            [sg.Text('Solar Modules')],
+            [sg.Text('Series'), sg.Spin(values=[i for i in range(1,10)], key='-SERIES-', initial_value=1), sg.Text('Parallel'), sg.Spin(values=[i for i in range(1,10)], key='-PARALLEL-', initial_value=1)],
             [combo_modules],
             [sg.Text('Location')],
             [[self.cp.ddCountry, self.cp.ddCity]],
@@ -116,6 +117,46 @@ class SSTopGui:
             self.clk.update_idletasks()
             self.clk.update_class()
 
+
+    def get_module_info(self):
+        return {'type': self.window.Element('-MODULES-').get(), 'series': self.window.Element('-SERIES-').get(), 'parallel': self.window.Element('-PARALLEL-').get(),}
+
+    def calcparams_desoto(self, module_params=None):
+        # adjust the reference parameters according to the operating
+        # conditions using the DeSoto model
+
+        if module_params == None:
+            module_params = self.modules[self.get_module_info()['type']]
+
+        IL, I0, Rs, Rsh, nNsVth = pvsys.calcparams_desoto(
+             self.clk.g_eff,
+             self.clk.t_air,        # ToDo: calculate the module temp from the air temp
+             module_params['alpha_sc'],
+             module_params['a_ref'],
+             module_params['I_L_ref'],
+             module_params['I_o_ref'],
+             module_params['R_sh_ref'],
+             module_params['R_s'],
+             EgRef=1.121,
+             dEgdT=-0.0002677
+            )
+        return IL, I0, Rs, Rsh, nNsVth
+
+
+    def singleDiode(self, IL, I0, Rs, Rsh, nNsVth, pnts=100, method='lambertw'):
+        curve_info = []
+        if IL <= 0:
+            IL = 0.1
+        curve_info = pvsys.singlediode(
+            photocurrent=IL,
+            saturation_current=I0,
+            resistance_series=Rs,
+            resistance_shunt=Rsh,
+            nNsVth=nNsVth,
+            ivcurve_pnts=pnts,
+            method=method
+        )
+        return curve_info
 
 class CityPicker:
     """ A pair of drop down controls populated with country and city

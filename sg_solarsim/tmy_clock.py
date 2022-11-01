@@ -45,6 +45,8 @@ class tmy_clock(Tkinter.Tk):
 
         # get the tmy data
         self.tmy_slice = tmy(lat=lat, lng=lng, tz=self.tz, daterange=[self.starttime, self.endtime]).tmy_slice
+        self.g_eff = 500     # effective irradiance
+        self.t_air = 20  # air temperature
 
         #self.iconphoto(False, Tkinter.PhotoImage(file='GS-PV-array-icon.png'))
 
@@ -129,7 +131,7 @@ class tmy_clock(Tkinter.Tk):
             cr.append(self.length[2] * math.sin(math.radians((now[2] * 6)) - math.radians(90)) + self.x)
             self.canvas.coords(self.sticks[2], tuple(cr))
 
-        # Determine the face color based on a linear interpolation of the ghi data
+        # update the effective irradiance
         time = (self.displaytime.replace(minute=0, second=0, microsecond=0))
         tmy_rows = self.tmy_slice.loc[time : time + timedelta(hours=1)]
         seek = (self.displaytime.timestamp() % 3600) / 3600
@@ -140,9 +142,19 @@ class tmy_clock(Tkinter.Tk):
             tmy_rows.iloc[1]['ghi'],
             seek
         )
+        self.g_eff = Y
+        # Determine the face color based on a linear interpolation of the ghi data
+        self.change_color(int(round((self.g_eff/1000)*256)))
 
-        self.change_color(int(round((Y/1000)*256)))
-
+        # update the effective temperature
+        X, Y = self.interpolate(
+            tmy_rows.index[0].timestamp(),
+            tmy_rows.iloc[0]['temp_air'],
+            tmy_rows.index[1].timestamp(),
+            tmy_rows.iloc[1]['temp_air'],
+            seek
+        )
+        self.t_air= Y
         # update the date
         txt = self.displaytime.strftime('%B %d')
         if self.pause:

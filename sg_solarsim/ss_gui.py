@@ -75,8 +75,8 @@ class SSTopGui:
         self.fig = None
         self.ax = None
         self.line = None
-        if self.iv_plot:
-            self.fig, self.ax = plt.subplots()
+        #if self.iv_plot:
+        #    self.fig, self.ax = plt.subplots()
 
 
     def launch_clock(self):
@@ -187,6 +187,9 @@ class SSTopGui:
             method=method
         )
         return curve_info
+
+    def i_from_v(self,Rsh, Rs, nNsVth, v, I0, IL):
+        return pvsys.i_from_v(Rsh, Rs, nNsVth, v, I0, IL)
 
 class CityPicker:
     """ A pair of drop down controls populated with country and city

@@ -4,4 +4,5 @@ from sg_solarsim import (  # noqua: F401
     timezones,
     tmy_clock,
     ss_gui,
+    mppt,
 )

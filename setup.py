@@ -18,6 +18,7 @@ INSTALL_REQUIRES = ['pvlib',
                     'datetime',
                     'pytz',
                     'timezonefinder',
+                    'matplotlib'
                     'importlib-metadata; python_version < "3.8"']
 
 PACKAGES = find_namespace_packages(include=['sg_solarsim*'])

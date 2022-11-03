@@ -34,6 +34,7 @@ setuptools_kwargs = {
 extensions = []
 
 setup(name=DISTNAME,
+      version='0.2.0',
       packages=PACKAGES,
       package_data=PACKAGE_DATA,
       install_requires=INSTALL_REQUIRES,

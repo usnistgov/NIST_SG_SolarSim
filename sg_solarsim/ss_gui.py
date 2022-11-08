@@ -82,8 +82,8 @@ class SSTopGui:
     def launch_clock(self):
         """ launched the TMY Clock window"""
         if self.clk == []:
-            starttime = datetime.strptime(self.window.Element('-START-').get(), '%B %d')
-            endtime = datetime.strptime(self.window.Element('-END-').get(), '%B %d')
+            starttime = datetime.strptime(self.window.Element('-START-').get(), '%B %d') + timedelta(hours=12)
+            endtime = datetime.strptime(self.window.Element('-END-').get(), '%B %d') + timedelta(hours=12)
             self.clk = tmy_clock(speed=int(self.window.Element("-SPEED-").get()), starttime=starttime, endtime=endtime, nosecond=False)
             if self.iv_plot:
                 # plot a default i-v curve
